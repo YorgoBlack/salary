@@ -1,0 +1,44 @@
+﻿@using SalaryApp.Models
+
+@{
+    Layout = null;
+}
+
+<html>
+<body>
+    @if (Request.IsAuthenticated)
+    {
+        if (this.User.IsInRole(SalaryRoles.Directors))
+        {
+            @Html.Raw("<iframe src='Static/Help/справка_директор.html' width='100%' height='100%' style='border: none;'></iframe>")
+
+        }
+        else if (this.User.IsInRole(SalaryRoles.Administrators))
+        {
+            @Html.Raw("<iframe src='Static/Help/справка_администратор.html' width='100%' height='100%' style='border:none;'></iframe>")
+        }
+        else if (this.User.IsInRole(SalaryRoles.Managers))
+        {
+            @Html.Raw("<iframe src='Static/Help/справка_лидер.html' width='100%' height='100%' style='border:none;'></iframe>")
+        }
+        else if (this.User.IsInRole(SalaryRoles.Assistant))
+        {
+            @Html.Raw("<iframe src='Static/Help/справка_рп.html' width='100%' height='100%' style='border:none;'></iframe>")
+        }
+        else if (this.User.IsInRole(SalaryRoles.Members))
+        {
+            @Html.Raw("<iframe src='Static/Help/справка_инженер.html' width='100%' height='100%' style='border:none;'></iframe>")
+        }
+    }
+    else
+    {
+        @Html.Raw("<iframe src='Static/Help/справка_инженер.html' width='100%' height='100%' style='border:none;'></iframe>")
+    }
+    </body>
+</html>
+
+
+
+
+
+

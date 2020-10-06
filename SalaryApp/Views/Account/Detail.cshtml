@@ -1,0 +1,19 @@
+﻿@model SalaryApp.Models.UserInfoModel
+@{
+    ViewBag.Title = "Учетная запись пользователя";
+}
+
+<h2>@ViewBag.Title</h2>
+
+<p class="text-success">@ViewBag.StatusMessage</p>
+<div>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>@Html.LabelFor(m => m.UserName, new { @class = "col-md-2 control-label" })</dt>
+        <dd>@Html.DisplayTextFor(m => m.UserName)</dd>
+        <dt>@Html.LabelFor(m => m.FullName, new { @class = "col-md-2 control-label" })</dt>
+        <dd>@Html.DisplayTextFor(m => m.FullName)</dd>
+        <dt>@Html.LabelFor(m => m.Email, new { @class = "col-md-2 control-label" })</dt>
+        <dd>@Html.DisplayTextFor(m => m.Email)</dd>
+    </dl>
+</div>

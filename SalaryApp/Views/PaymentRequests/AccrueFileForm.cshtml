@@ -1,0 +1,12 @@
+﻿@{
+    ViewBag.Title = "Загрузка файла";
+}
+<h2>Для начисления требуется файл ставок </h2>
+<h3>Выберите файл для импорта </h3>
+@using (Html.BeginForm("AccrueExec", "PaymentRequests", FormMethod.Post, new { enctype = "multipart/form-data" }))
+{
+    @Html.AntiForgeryToken()
+
+    <input type="file" name="upload" /><br>
+    <input type="submit" value="Выполнить" />
+}

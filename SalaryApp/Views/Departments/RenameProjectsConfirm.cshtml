@@ -1,0 +1,51 @@
+﻿@using SalaryApp.Models
+@model SalaryApp.Models.ProjectRenameModel
+
+@{
+    ViewBag.Title = "Редактирование (объединение) проекта (ов)";
+}
+
+<h3>@ViewBag.Title</h3>
+
+@using (Html.BeginForm("RenameProjects","Departments"))
+{
+@Html.AntiForgeryToken()
+@Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+
+<div class="form-group">
+    @Html.TextBoxFor(m => m.NewName, new { @class = "form-control", @placeholder = "Введине новое название проекта(ов)" })
+</div>
+<div class="form-group">
+    <b>Направление</b>
+    <select name="DepartmentId" class="form-control" id="DepartmentId">
+        @foreach(var item in Model.Depts)
+        {
+            string selected = item.Key == Model.DepartmentId ? "selected='selected'" : "";
+            <option value="@item.Key" @selected>@item.Value</option>
+        }
+    </select>
+</div>
+
+<div class="form-group">
+    <b>Будут переименованы (объединены) проекты</b>
+    <table>
+        @for(int i=0; i<Model.Projects.Count; i++)
+    {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => Model.Projects[i].Name)
+                @Html.HiddenFor(modelItem => Model.Projects[i].ProjectId)
+                @Html.HiddenFor(modelItem => Model.Projects[i].Name)
+            </td>
+        </tr>
+    }
+    </table>
+</div>
+<div class="form-group">
+    <input type="submit" value="Сохранить" class="btn btn-default" />
+    <input type="submit" value="Отмена" class="btn btn-default" onclick="javascript: location.href = '/Departments/ProjectsIndex'; return false;" />
+</div>
+
+    }
+

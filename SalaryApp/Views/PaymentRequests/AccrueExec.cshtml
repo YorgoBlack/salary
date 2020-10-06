@@ -1,0 +1,74 @@
+﻿@using SalaryApp.Models
+@model AccruiesViewModel
+@using PagedList.Mvc;
+
+
+
+@if (Model.Accruies.Count() > 0)
+{
+    <h2>Будет начислены следующие премии </h2>
+    using (Html.BeginForm("AccrueConfirm", "PaymentRequests", FormMethod.Post))
+    {
+
+        <table class="table">
+            <tr>
+                <th>ФИО</th>
+                <th>Сумма</th>
+                <th>Проект</th>
+                <th>Прим</th>
+            </tr>
+
+            @{ var index = 0; }
+            @foreach (var item in Model.Accruies)
+            {
+                <tr>
+                    @Html.Hidden("Accruies[" + index + "].UserId", item.UserId)
+                    @Html.Hidden("Accruies[" + index + "].ProjectId", item.ProjectId)
+                    @Html.Hidden("Accruies[" + index + "].Sum", item.Sum)
+                    @Html.Hidden("Accruies[" + index + "].RequestId", item.RequestId)
+
+                    <td>
+                        @Html.DisplayFor(modelitem => item.UserShortName)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelitem => item.Sum)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelitem => item.ProjectName)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelitem => item.Comments)
+                    </td>
+                    @{ index++; }
+                </tr>
+            }
+
+        </table>
+        <hr />
+
+        for (int index0 = 0; index0 < Model.RequestsIds.Count; index0++)
+        {
+            @Html.Hidden("RequestsIds[" + index0 + "]", Model.RequestsIds[index0])
+        }
+
+        <div class="form-group">
+            <div class="col-md-10">
+                <input type="submit" value="Создать" class="btn btn-default" />
+            </div>
+        </div>
+
+    }
+}
+else
+{
+    <h3>Нет заявок для начисления</h3>
+}
+
+<hr />
+<div>
+    @Html.ActionLink("Back to List", "Index")
+</div>
+
+
+@section Scripts {
+}

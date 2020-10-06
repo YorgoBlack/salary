@@ -1,0 +1,94 @@
+﻿@using SalaryApp.Models
+@model SalaryApp.Models.PaymentsGroupViewModel
+
+<h4>Счет</h4>
+
+<dl class="dl-horizontal">
+    <dt>
+        @Html.DisplayNameFor(model => model.WhenCreated)
+    </dt>
+
+    <dd>
+        @Html.DisplayFor(model => model.WhenCreated)
+    </dd>
+    <dt>
+        @Html.DisplayNameFor(model => model.State)
+    </dt>
+    <dd>
+        @if (!Model.ShowEditable)
+        {
+            @Html.EnumDisplayNameFor(Model.State)
+        }
+        else 
+        {
+            @Html.EnumDropDownListFor(model => model.State, new { @class = "form-control" })
+            @Html.Raw(" (измените статус для оплаченного счета)")
+        }
+    </dd>
+    @if (Model.State == PaymentsGroupState.PaidOut)
+    {
+        <dt>
+            @Html.DisplayNameFor(model => model.WhenPaidOut)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.WhenPaidOut)
+        </dd>
+    }
+
+</dl>
+
+<table class="table" border="1">
+    <tr>
+        <th rowspan="2" style="text-align:center; vertical-align:middle;" valign="bottom">
+            ФИО
+        </th>
+        <th colspan="@Model.ProjectsIds.Length" style="text-align:center;">
+            Проекты
+        </th>
+    </tr>
+    <tr>
+        @for (int i = 0; i < Model.ProjectsNames.Length; i++)
+        {
+        <th>
+            @Html.Raw(Model.ProjectsNames[i])
+            @Html.HiddenFor(modelItem => Model.ProjectsIds[i])
+            @Html.HiddenFor(modelItem => Model.ProjectsNames[i])
+        </th>
+        }
+    </tr>
+    @for (int i=0; i< Model.UserIds.Length; i++)
+    {
+    <tr>
+        <td>
+            @Html.Raw(Model.UserNames[i])
+            @Html.HiddenFor(modelItem => Model.UserIds[i])
+            @Html.HiddenFor(modelItem => Model.UserNames[i])
+        </td>
+        @for(int j=0; j<Model.ProjectsIds.Length;j++)
+        {
+            <td>
+                @if(Model.Payments[i][j] != -1 )
+                {
+                    if (!Model.ShowEditable)
+                    {
+                        @Html.Raw(Model.Payments[i][j])
+                    }
+                    else
+                    {
+                        @Html.EditorFor(modelItem=> Model.Payments[i][j])
+                        @Html.ValidationMessageFor(modelItem => Model.Payments[i][j], "", new { @class = "text-danger" })
+                    }
+                }
+                else
+                {
+                    if (Model.ShowEditable)
+                    {
+                        @Html.HiddenFor(modelItem => Model.Payments[i][j])
+                    }
+                }
+            </td>
+        }
+    </tr>    
+    }
+</table>

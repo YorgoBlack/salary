@@ -1,0 +1,16 @@
+﻿@model SalaryApp.Models.RateUploadModel
+@{
+    ViewBag.Title = "Экспорт вирт счета";
+}
+<h2>Для экспорта вирт счета требуется файл ставок </h2>
+<h3>Выберите файл для импорта </h3>
+@using (Html.BeginForm("ExportForm", "PaymentsGroups", FormMethod.Post, new { enctype = "multipart/form-data" }))
+{
+    @Html.AntiForgeryToken()
+    @Html.ValidationSummary()
+    @Html.HiddenFor(Model => Model.PaymentsGroupId)
+    <input type="file" name="UploadFile" /><br>
+    <br />
+    <br />
+    <input type="submit" value="Выполнить" />
+}

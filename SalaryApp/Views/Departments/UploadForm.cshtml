@@ -1,0 +1,11 @@
+﻿@{
+    ViewBag.Title = "Загрузка файла";
+}
+<h3>Выберите файл для импорта </h3>
+@using (Html.BeginForm("Upload", "Departments", FormMethod.Post, new { enctype = "multipart/form-data" }))
+{
+    @Html.AntiForgeryToken()
+
+    <input type="file" name="upload" /><br>
+    <input type="submit" value="Выполнить" />
+}

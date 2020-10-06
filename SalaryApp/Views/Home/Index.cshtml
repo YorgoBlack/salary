@@ -1,0 +1,110 @@
+﻿@model SalaryApp.Models.PaymentSearchModel
+@using PagedList.Mvc;
+
+@{
+    ViewBag.Title = "Просмотр премий за выбранный период";
+}
+
+<br />
+<table width="25%"><tr><td>@Html.ActionLink("По датам", "Index", "Home")</td><td>@Html.ActionLink("По проектам", "MemberProjects")</td></tr></table>
+
+
+<h2>Просмотр премий за выбранный период</h2>
+Правила начисления премий описаны в <a href="http://wiki.kharkov.owen/index.php/Механизм_начисления_премий_КБ" target="_blank">базе знаний КБ</a>
+<hr />
+
+@using (Html.BeginForm("Index", "Home", FormMethod.Get))
+{
+
+    <div class="row">
+
+        <div class="form-horizontal">
+            <div class="col-lg-3">
+                @Html.TextBoxFor(m => m.DateFrom, "{0:MM/dd/yyyy}", new { @class = "form-control datepicker", @placeholder = "Дата от" })
+            </div>
+            <div class="col-lg-3">
+                @Html.TextBoxFor(m => m.DateTo, "{0:MM/dd/yyyy}", new { @class = "form-control  datepicker", @placeholder = "Дата до" })
+            </div>
+            <div class="col-lg-3">
+                @Html.DropDownListFor(m => m.Project, new SelectList(ViewBag.Projects, "ProjectId", "ProjectName", Model.Project ?? Model.Project),
+                                                       "Все", new { @class = "form-control", @placeholder = "Проект" })
+            </div>
+            <div class="col-lg-3">
+                <button type="submit" class="btn btn-success">
+                    <span class="glyphicon glyphicon-search"></span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <h4>
+        Остаток к выплате, грн:
+        @ViewBag.TotalBalance
+        @if (Model.Project != null)
+        {
+            @Html.Raw(", по проекту: " + @ViewBag.Balance)
+        }
+    </h4>
+    <h4>Всего выплачено, грн: @ViewBag.PaidOutSum</h4>
+    if (Model.SearchResults != null && Model.SearchResults.Count > 0)
+    {
+        <table class="table">
+            <tr>
+                <th>
+                    @Html.ActionLink("Месяц", "Index", Model.getQueryParams("during"))
+                    @if (!String.IsNullOrEmpty(Model.DuringSortOrder))
+                    {
+                        if (Model.DuringSortOrder == "asc")
+                        {<i class="glyphicon glyphicon-triangle-bottom"></i> }
+                        else
+                        { <i class="glyphicon glyphicon-triangle-top"></i>}
+                    }
+                </th>
+                <th>
+                    Выплачено по проекту, грн
+                </th>
+                <th>
+                    @Html.ActionLink("Проект", "Index", Model.getQueryParams("project"))
+                    @if (!String.IsNullOrEmpty(Model.ProjectSortOrder))
+                    {
+                        if (Model.ProjectSortOrder == "asc")
+                        {<i class="glyphicon glyphicon-triangle-bottom"></i> }
+                        else
+                        { <i class="glyphicon glyphicon-triangle-top"></i>}
+                    }
+
+                </th>
+                <th></th>
+            </tr>
+
+            @foreach (var item in Model.SearchResults)
+            {
+                <tr>
+                    <td width="200px">
+                        @Html.TextBoxFor(modelItem => item.PaymentGroup.WhenCreated, "{0:MMM/yyyy}", new { disabled = "disabled" })
+                    </td>
+                    <td width="300px">
+                        @Html.DisplayFor(modelItem => item.Sum)
+                    </td>
+                    <td align="left">
+                        @Html.DisplayFor(modelItem => item.Project.Name)
+                    </td>
+                </tr>
+            }
+
+        </table>
+
+        <h4>Выплачено за выбранный период, грн: @ViewBag.FilterSum</h4>
+
+        @Html.PagedListPager(Model.SearchResults, page => Url.Action("Index", Model.getQueryParams(page)), PagedListRenderOptions.PageNumbersOnly)}
+
+
+}
+
+@section Scripts {
+    <script type="text/javascript">
+        $(function () {
+            $('.datepicker').datepicker({ format: 'dd.mm.yyyy', language: "ru" });
+        });
+    </script>
+}

@@ -1,0 +1,55 @@
+﻿@model IEnumerable<SalaryApp.Models.MemberProjectView>
+
+@{
+    ViewBag.Title = "КБ Овен \"Харьков\"";
+}
+
+<br />
+
+<table width="25%"><tr><td>@Html.ActionLink("По датам", "Index", "Home")</td><td>@Html.ActionLink("По проектам", "MemberProjects")</td></tr></table>
+
+<h2>Просмотр премий по проектам</h2>
+Правила начисления премий описаны в <a href="http://wiki.kharkov.owen/index.php/Механизм_начисления_премий_КБ" target="_blank">базе знаний КБ</a>
+<hr />
+<table class="table">
+    <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.ProjectName)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.TotalSum)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Debet)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Balance)
+        </th>
+    </tr>
+
+
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.ProjectName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.TotalSum)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Debet)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Balance)
+            </td>
+            <td>
+                @Html.ActionLink("Подробно", "Index", new SalaryApp.Models.PaymentSearchModel { Project = item.ProjectId })
+            </td>
+        </tr>
+    }
+
+
+</table>
+
+

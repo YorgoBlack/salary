@@ -1,0 +1,80 @@
+﻿@model IEnumerable<SalaryApp.Models.MemberProjectView>
+@using  SalaryApp.Models
+
+@{
+    ViewBag.Title = "КБ Овен \"Харьков\"";
+}
+<br />
+@if (this.User.IsInRole(SalaryRoles.Administrators) || this.User.IsInRole(SalaryRoles.Directors) || this.User.IsInRole( SalaryRoles.Managers ) )
+{
+<table width="80%"><tr>
+    <td>
+        @Html.ActionLink("По сотрудникам", "Members")
+    </td>
+    <td>
+        @Html.ActionLink("По проектам", "Projects")
+    </td>
+    @if (this.User.IsInRole(SalaryRoles.Administrators) || this.User.IsInRole(SalaryRoles.Directors))
+        {
+    <td>
+        <!-- @Html.ActionLink("Импорт выплат из файла", "UploadForm", "Departments") -->
+    </td>
+    <td>
+        @Html.ActionLink("Экспорт выплат и настроек", "Export", "Departments")
+    </td>
+    <td>
+        @Html.ActionLink("Импорт выплат и настроек из файла", "ImportForm", "Departments")
+    </td>
+        }
+</tr></table>
+}
+<hr />
+<h2>Просмотр премий по проектам</h2>
+
+<table class="table">
+    <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.ProjectName)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.ProjectState)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.TotalSum)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Debet)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Balance)
+        </th>
+    </tr>
+
+
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.ProjectName)
+            </td>
+            <td>
+                @Html.EnumDisplayNameFor(item.ProjectState)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.TotalSum)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Debet)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Balance)
+            </td>
+            <td>
+            </td>
+        </tr>
+    }
+
+
+</table>
+
+

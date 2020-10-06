@@ -1,0 +1,322 @@
+﻿@using SalaryApp.Models
+@model SalaryApp.Models.PaymentRequestSearchModel
+@using PagedList.Mvc;
+
+<h2>Список заявок</h2>
+
+<table width="70%">
+    <tr>
+        @if (this.User.IsInRole(SalaryRoles.Administrators))
+    {
+        <td>
+            @Html.ActionLink("Начислить утверждённые премии", "AccrueFileForm")
+        </td>
+    }
+        @if (this.User.IsInRole(SalaryRoles.Directors))
+    {
+        if (!this.User.IsInRole(SalaryRoles.Managers) && !this.User.IsInRole(SalaryRoles.Assistant))
+        {
+        <td>
+            @Html.ActionLink("Создать заявку", "Create")
+        </td>
+        }
+
+        <td>
+            <a onclick="DoChangeStateAll('@PaymentRequestState.Confirmed');return false;" style="cursor:pointer;">Утвердить всё</a>
+        </td>
+        <td>
+            <a onclick="DoChangeStateAll('@PaymentRequestState.Rejected');return false;" style="cursor:pointer;">Отклонить всё</a>
+        </td>
+        <td>
+            <a onclick="DoChangeStateAll('@PaymentRequestState.ReWorked');return false;" style="cursor:pointer;">Всё на доработку</a>
+        </td>
+    }
+        @if (this.User.IsInRole(SalaryRoles.Managers) || this.User.IsInRole(SalaryRoles.Assistant))
+    {
+        <td>
+            @Html.ActionLink("Создать заявку", "Create")
+        </td>
+        <td>
+            <a onclick="DoChangeStateAll('@PaymentRequestState.WaitConfirm');return false;" style="cursor:pointer;">Отправить всё на утверждение</a>
+        </td>
+    }
+    </tr>
+</table>
+<br />
+
+@using (Html.BeginForm("Index", "PaymentRequests", FormMethod.Get))
+{
+@Html.ValidationSummary(true, "", new { @class = "text-danger" })
+<div class="row">
+    <div class="form-horizontal">
+        <div class="col-lg-3">
+            @Html.ListBoxFor(m => m.SelectedStates, Model.GetRequestStatesFor(this.User), new { @id = "FilterStatesListBox", @class = "form-control", @placeholder = "Показывать всё" })
+        </div>
+    </div>
+</div>
+<br />
+<div class="row" style="width:70%">
+    <div class="form-horizontal">
+
+        <div class="col-lg-3">
+            @Html.TextBoxFor(m => m.DateFrom, "{0:dd.MM.yyyy}", new { @class = "form-control datepicker", @placeholder = "Дата от" })
+        </div>
+        <div class="col-lg-3">
+            @Html.TextBoxFor(m => m.DateTo, "{0:dd.MM.yyyy}", new { @class = "form-control  datepicker", @placeholder = "Дата до" })
+        </div>
+        <div class="col-lg-3">
+            @Html.DropDownListFor(m => m.Project, new SelectList(ViewBag.Projects, "ProjectId", "Name"), "Все", new { @class = "form-control", @placeholder = "Проект" })
+        </div>
+        <div class="col-lg-3">
+            <button type="submit" class="btn btn-success">
+                <span class="glyphicon glyphicon-search"></span>
+            </button>
+        </div>
+    </div>
+</div>
+<br />
+}
+
+@if (Model.SearchResults != null && Model.SearchResults.Count > 0)
+{
+<table class="table-striped table-bordered" style="width:100%" id="gridtable1">
+    <tr style="height:50px;" id="myheader1">
+        <th style="padding-left:10px">
+            Создана
+        </th>
+        <th style="padding-left:10px">
+            Состояние
+        </th>
+        @if (!this.User.IsInRole(SalaryRoles.Administrators) || this.User.IsInRole(SalaryRoles.Directors))
+    {
+        <th style="padding-left:10px">
+            Изменить состояние
+        </th>
+}
+
+        @if (this.User.IsInRole(SalaryRoles.Administrators) || this.User.IsInRole(SalaryRoles.Directors) || this.User.IsInRole(SalaryRoles.Managers))
+    {
+        <th style="padding-left:10px">
+            Начислил
+        </th>
+}
+        <th style="padding-left:10px">
+            Получатель
+        </th>
+        <th style="padding-left:10px">
+            Проект
+        </th>
+        <th style="padding-left:10px">
+            Сумма
+        </th>
+        <th style="padding-left:10px">
+            Исполнена
+        </th>
+        <th style="padding-left:10px">Отметка <br />о согласовании</th>
+        <th style="padding-left:10px">Операции</th>
+        <th style="padding-left:10px">Просмотр<br /> вложений</th>
+        <th style="padding-left:10px">Комментарии</th>
+    </tr>
+
+    @foreach (var item in Model.SearchResults)
+        {
+    <tr>
+        <td style="padding-left:10px">
+            @item.WhenCreated.ToString("dd.MM.yyyy")
+        </td>
+        <td style="padding-left:10px">
+            @Html.EnumDisplayNameFor(item.RequestState)
+        </td>
+
+        @if (!this.User.IsInRole(SalaryRoles.Administrators) || this.User.IsInRole(SalaryRoles.Directors))
+            {
+
+        <td style="padding-left:10px">
+            @Html.DropDownListFor(modelItem => item.RequestState, item.GetRequestStatesFor(this.User, item), new
+                {
+                    onchange = "OnRequestChangeState(" + item.PaymentRequestId + ")",
+                    @class = "form-control",
+                    @id = "RequestDropDown_" + item.PaymentRequestId
+                })
+        </td>
+        }
+        @if (this.User.IsInRole(SalaryRoles.Administrators) || this.User.IsInRole(SalaryRoles.Directors) || this.User.IsInRole(SalaryRoles.Managers))
+        {
+        <td style="padding-left:10px">
+            @if (item.AppointedUser.ShortName == null)
+                {
+            @Html.DisplayFor(modelItem => item.AppointedUser.UserName)
+                }
+                else
+                {
+            @Html.DisplayFor(modelItem => item.AppointedUser.ShortName)
+                }
+        </td>
+}
+        <td style="padding-left:10px">
+            @if (item.RecipientUser.ShortName == null)
+                {
+            @Html.DisplayFor(modelItem => item.RecipientUser.UserName)
+                }
+                else
+                {
+            @Html.DisplayFor(modelItem => item.RecipientUser.ShortName)
+                }
+        </td>
+        <td style="padding-left:10px">
+            @Html.DisplayFor(modelItem => item.Project.Name)
+        </td>
+        <td style="padding-left:10px">
+            @Html.DisplayFor(modelItem => item.TimesOrSum)
+            &nbsp;
+            @Html.EnumDisplayNameFor(item.SumType);
+        </td>
+        <td style="padding-left:10px">
+            @if(item.RequestState == PaymentRequestState.Credited )
+                {
+            @item.WhenStateChanged.ToString("dd.MM.yyyy")
+                }
+        </td>
+        <td style="padding-left:10px">
+            @if (item.AgreedPM)
+        {
+            <span>Согласована с ПМ</span>
+}
+        </td>
+        <td style="padding-left:10px">
+
+        @if ( ((this.User.IsInRole(SalaryRoles.Managers) || this.User.IsInRole(SalaryRoles.Assistant) ) && ((item.RequestState == PaymentRequestState.InProcess || item.RequestState == PaymentRequestState.ReWorked) || item.RequestState == PaymentRequestState.Rejected)  ) ||
+              (this.User.IsInRole(SalaryRoles.Directors) && (item.RequestState == PaymentRequestState.WaitConfirm) && (item.AppointedUser.UserName == this.User.Identity.Name) ) )
+        {
+            @Html.ActionLink("Изменить", "Edit", new { id = item.PaymentRequestId })
+            if( ( (item.RequestState == PaymentRequestState.InProcess || item.RequestState == PaymentRequestState.Rejected) && (this.User.IsInRole(SalaryRoles.Managers) || this.User.IsInRole(SalaryRoles.Assistant))) ||
+                (item.RequestState == PaymentRequestState.WaitConfirm && (this.User.IsInRole(SalaryRoles.Directors))) )
+            {
+            @Html.Raw("&nbsp;&nbsp;&nbsp;")
+            @Html.ActionLink("Удалить", "Delete", new { id = item.PaymentRequestId })
+            }
+        }
+        </td>
+
+        <td style="padding-left:10px">
+            @if (!String.IsNullOrEmpty(item.AttachedFileName))
+        {
+            @Html.ActionLink("Открыть вложение", "Download", new { file = @item.AttachedFileName })
+        }
+        </td>
+
+        <td style="padding-left:10px">
+            @if(Model.Comments.ContainsKey(item.PaymentRequestId))
+            {
+            @Html.ActionLink("Комментарии", "Comments", new { id = item.PaymentRequestId }, new { onclick = "ShowComments(" + item.PaymentRequestId + ");return false;" })
+            }
+        </td>
+
+    </tr>
+        }
+
+</table>
+
+    using (Html.BeginForm("Index", "PaymentRequests", FormMethod.Get))
+    {
+
+@Html.PagedListPager(Model.SearchResults, page => Url.Action("Index", Model.getQueryParams(page)), PagedListRenderOptions.PageNumbersOnly)
+    }
+
+<div id='myModal' class='modal'>
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div id='myModalContent'></div>
+        </div>
+    </div>
+
+</div>
+
+<div id='wndEnterComments' class='modal'>
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div style="margin:50px;">
+                <form id="FormChangeState" action="/PaymentRequests/ChangeState" method="post">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="PaymentRequestId_Modal" id="PaymentRequestId_Modal" value="-1" />
+                    <input type="hidden" name="PaymentRequestState_Modal" id="PaymentRequestState_Modal" value="-1" />
+                    <b>Введите комментарий, если необходимо и нажмите продолжить</b>
+                    <br />
+                    <br />
+                    <textarea margin="30px" name="Comments" class="form-control" id="Comments" rows="5" cols="500"></textarea>
+                    <br />
+                    <button type="submit" class="btn btn-default" data-dismiss="modal" aria-hidden="true">Продолжить</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+}
+
+
+@section Scripts {
+
+    <script type="text/javascript">
+
+        $(function () {
+            $('.datepicker').datepicker({ format: 'dd.mm.yyyy', language: "ru" });
+            $('#FilterStatesListBox').multiselect({
+                includeSelectAllOption: true
+            });
+        });
+
+        function DoChangeStateAll(requestState) {
+            var options = { "backdrop": "static", keyboard: true };
+            $('#wndEnterComments').modal(options);
+            $('#wndEnterComments').on('hide.bs.modal', function (e) {
+                document.getElementById("PaymentRequestState_Modal").value = requestState;
+                document.getElementById("FormChangeState").action = "/PaymentRequests/ChangeStateAll";
+                document.getElementById("FormChangeState").submit();
+            })
+            $('#wndEnterComments').modal('show');
+        }
+
+        function OnRequestChangeState(requestId) {
+            var options = { "backdrop": "static", keyboard: true };
+            $('#wndEnterComments').modal(options);
+            $('#wndEnterComments').on('hide.bs.modal', function (e) {
+                document.getElementById("PaymentRequestId_Modal").value = requestId;
+                var e = document.getElementById("RequestDropDown_" + requestId);
+                document.getElementById("PaymentRequestState_Modal").value = e.options[e.selectedIndex].value;
+                document.getElementById("FormChangeState").action = "/PaymentRequests/ChangeState";
+                document.getElementById("FormChangeState").submit();
+            })
+            $('#wndEnterComments').modal('show');
+        }
+
+        function ShowComments(requestId) {
+
+            var options = { "backdrop": "static", keyboard: true };
+            $.ajax({
+                type: "GET",
+                url: "PaymentRequests/HistoryComments",
+                contentType: "application/json; charset=utf-8",
+                data: { "id": requestId },
+                datatype: "json",
+                success: function (data) {
+                    $('#myModalContent').html(data);
+                    $('#myModal').modal(options);
+                    $('#myModal').modal('show');
+
+                },
+                error: function () {
+                    alert("Dynamic content load failed.");
+                }
+            });
+        }
+
+        //$("#closebtn").on('click',function(){
+        //    $('#myModal').modal('hide');
+
+        $("#closbtn").click(function () {
+            $('#myModal').modal('hide');
+        });
+
+    </script>
+}

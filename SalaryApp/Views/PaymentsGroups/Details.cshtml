@@ -1,0 +1,135 @@
+﻿@model SalaryApp.Models.PG_ListViewModel
+@using SalaryApp.Models
+
+<h4>Счет</h4>
+
+<dl class="dl-horizontal">
+    <dt>
+        @Html.DisplayNameFor(model => model.Header.WhenCreated)
+    </dt>
+
+    <dd>
+        @Html.DisplayFor(model => model.Header.WhenCreated)
+    </dd>
+    <dt>
+        @Html.DisplayNameFor(model => model.Header.State)
+    </dt>
+    <dd>
+@if (!Model.Header.ShowEditable)
+{
+        @Html.EnumDisplayNameFor(Model.Header.State)
+}
+else
+{
+    @Html.EnumDropDownListFor(model => model.Header.State, new { @class = "form-control" })
+    @Html.Raw(" (измените статус для оплаченного счета)<br><br>")
+        
+    <dt>Добавление строки выплат по сотруднику</dt>
+    <dd>
+        @Html.AutocompleteFor(model => model.NewUserPaymentName, model => model.NewUserPaymentName, "FindUserByName", "Departments", false, new { htmlAttributes = new { @class = "form-control", @id="NewUserPaymentName"} })
+    </dd>
+    <dt id="NewUserPaymentProjectLable" style="display:none;">Проект</dt>
+    <dd>
+        <select name="NewUserPaymentProject" class="form-control" id="NewUserPaymentProject" style="display:none;"/>
+    </dd>
+    <dt id="NewUserPaymentSumLable" style="display:none;" >Сумма</dt>
+    <dd>
+        @Html.TextBoxFor(model => model.NewUserPaymenSum, new { @class = "form-control", @id="NewUserPaymentSum", @style="display:none;" })
+    </dd>
+<dt></dt>
+<dd>
+    <input type="submit" value="Добавить" name="action:AddPaymentLine" class="btn btn-default" id="NewUserPaymentButton", style="display:none;" />
+</dd>
+
+
+
+}
+@if (Model.Header.State == PaymentsGroupState.PaidOut)
+{
+        <dt>
+            @Html.DisplayNameFor(model => model.Header.WhenPaidOut)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Header.WhenPaidOut)
+        </dd>
+}
+
+    </dl>
+
+<table class="table" border="1">
+    <tr>
+        <th>
+            ФИО
+        </th>
+        <th>
+            Проекты
+        </th>
+        <th>
+            Остаток по проекту
+        </th>
+        <th>
+            Сумма к выплате по проекту
+        </th>
+        <th>
+            Регулярная выплата
+        </th>
+
+    </tr>
+    @for (int i = 0; i < Model.Header.UserIds.Length; i++)
+    {
+        bool f = true;
+        for (int j = 0; j < Model.Header.Payments[i].Length; j++)
+        {
+            <tr>
+                @if (f)
+                {
+                    <td rowspan="@Model.Header.Payments[i].Length">
+                        @Html.Raw(Model.Header.UserNames[i])
+                        @Html.HiddenFor(modelItem => Model.Header.UserIds[i])
+                        @Html.HiddenFor(modelItem => Model.Header.UserNames[i])
+                    </td>
+                }
+                <td>
+                    @Html.Raw(Model.ProjectNames[i][j])
+                    @Html.HiddenFor(modelItem => Model.ProjectNames[i][j])
+                </td>
+                <td>
+                    @Html.HiddenFor(modelItem => Model.Balances[i][j])
+                    @Html.DisplayFor(modelItem => Model.Balances[i][j])
+                </td>
+
+                <td>
+                    @if (!Model.Header.ShowEditable)
+                    {
+                        @Html.Raw(Model.Header.Payments[i][j])
+                    }
+                    else
+                    {
+                        @Html.HiddenFor(modelItem => Model.ProjectIds[i][j])
+                        @Html.TextBoxFor(modelItem => Model.Header.Payments[i][j], new { onchange = "OnEditPayment(" + i + ", " + j + ")" })
+                        @Html.ValidationMessageFor(modelItem => Model.Header.Payments[i][j], "", new { @class = "text-danger" })
+                    }
+                </td>
+
+                <td>
+                    @if (!Model.Header.ShowEditable && Model.Header.RegularPayments[i][j] != 0)
+                    {
+                        @Html.Raw(Model.Header.RegularPayments[i][j])
+                    }
+                    else if (Model.Header.RegularPayments[i][j] != 0)
+                    {
+                        @Html.EditorFor(modelItem => Model.Header.RegularPayments[i][j])
+                        @Html.ValidationMessageFor(modelItem => Model.Header.RegularPayments[i][j], "", new { @class = "text-danger" })
+                    }
+                    else
+                    {
+                        @Html.HiddenFor(modelItem => Model.Header.RegularPayments[i][j])
+                    }
+                </td>
+
+                @{f = false;}
+            </tr>
+        }
+    }
+</table>

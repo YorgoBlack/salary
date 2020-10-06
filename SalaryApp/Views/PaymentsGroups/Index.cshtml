@@ -1,0 +1,61 @@
+﻿@using SalaryApp.Models
+@model IEnumerable<SalaryApp.Models.PaymentsGroup>
+
+<h2>Счета</h2>
+
+<p>
+    @Html.ActionLink("Создать счет", "UploadForm")
+</p>
+<table class="table">
+    <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.WhenCreated)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.WhenPaidOut)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.State)
+        </th>
+        <th>Сумма по счету</th>
+        <th></th>
+    </tr>
+
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td>
+                @item.WhenCreated.ToString("dd.MM.yyyy")
+            </td>
+            <td>
+                @if (item.State == PaymentsGroupState.PaidOut)
+                {
+                    @item.WhenPaidOut.ToString("dd.MM.yyyy")
+                }
+            </td>
+            <td>
+                @Html.EnumDisplayNameFor(item.State)
+            </td>
+            <td>
+                @ViewBag.TotalSum[item.PaymentsGroupId]
+            </td>
+
+            <td>
+                @Html.ActionLink("Просмотр", "Details", new { id = item.PaymentsGroupId })
+                @Html.Raw("|")
+                @Html.ActionLink("Экспорт", "ExportForm", new { id = item.PaymentsGroupId })
+                @if (item.State != SalaryApp.Models.PaymentsGroupState.PaidOut)
+                {
+                    @Html.Raw("|");
+                    @Html.ActionLink("Открыть", "Edit", new { id = item.PaymentsGroupId });
+                    @Html.Raw("|");
+                }
+                @if (item.State != SalaryApp.Models.PaymentsGroupState.PaidOut)
+                {
+                    @Html.ActionLink("Удалить", "Delete", new { id = item.PaymentsGroupId })
+                }
+            </td>
+        </tr>
+    }
+
+</table>

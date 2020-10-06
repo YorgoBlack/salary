@@ -1,0 +1,42 @@
+﻿@model SalaryApp.Models.RegularPayment
+
+    <h3>Вы действительно хотите удалить?</h3>
+    <div>
+        <h4>Регулярный платеж</h4>
+        <hr />
+        <dl class="dl-horizontal">
+            <dt>
+                ФИО
+            </dt>
+    
+            <dd>
+                @Html.DisplayFor(model => model.RecipientUser.FullName)
+            </dd>
+    
+            <dt>
+                @Html.DisplayNameFor(model => model.Project.Name)
+            </dt>
+    
+            <dd>
+                @Html.DisplayFor(model => model.Project.Name)
+            </dd>
+    
+            <dt>
+                @Html.DisplayNameFor(model => model.Sum)
+            </dt>
+    
+            <dd>
+                @Html.DisplayFor(model => model.Sum)
+            </dd>
+    
+        </dl>
+    
+        @using (Html.BeginForm()) {
+            @Html.AntiForgeryToken()
+    
+            <div class="form-actions no-color">
+                <input type="submit" value="Delete" class="btn btn-default" /> |
+                @Html.ActionLink("Back to List", "Index")
+            </div>
+        }
+    </div>

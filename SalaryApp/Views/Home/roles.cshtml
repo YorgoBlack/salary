@@ -1,0 +1,22 @@
+﻿@model IEnumerable<SalaryApp.Models.URolesItem>
+
+<table>
+
+    @foreach (var item in Model)
+    {
+    <tr>
+        <td>
+            @Html.Raw(item.name)
+        </td>
+
+        @foreach (var x in item.Roles)
+        {
+        <td>
+            @Html.Raw("&nbsp;")@Html.Raw("&nbsp;")@Html.Raw("&nbsp;")@Html.Raw("&nbsp;")
+            @Html.Raw(x)
+        </td>
+        }
+    </tr>
+    }
+        
+    </table>

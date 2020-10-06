@@ -1,0 +1,121 @@
+﻿@using SalaryApp.Models
+@model SalaryApp.Models.DepartmentsList
+
+@{
+    ViewBag.Title = "Направления";
+}
+<br />
+<table width="30%">
+    <tr>
+        <td>
+            @Html.ActionLink("Направления", "Index")
+        </td>
+        <td>
+            @Html.ActionLink("Проекты", "ProjectsIndex")
+        </td>
+    </tr>
+</table>
+
+
+<h2>Направления</h2>
+<br />
+<table width="60%">
+    <tr>
+        <td>
+            Директор @Html.ActionLink((String.IsNullOrEmpty(Model.Director) ? "выбрать" : Model.Director), "ChangeDirector")
+        </td>
+        <td>
+            Администратор @Html.ActionLink((String.IsNullOrEmpty(Model.Administrator) ? "выбрать" : Model.Administrator), "ChangeAdminstrator")
+        </td>
+    </tr>
+</table>
+
+<hr />
+@Html.ActionLink("Добавить новое подразделение", "Create")
+
+<table class="table">
+    <tr>
+        <th>
+            Направление
+        </th>
+        <th>
+            Лидер
+        </th>
+        <th>
+            Руководитель проектов
+        </th>
+        <th></th>
+    </tr>
+
+    @foreach (var item in Model.depts)
+    {
+    <tr>
+        <td>
+            @Html.DisplayFor(modelItem => item.Name)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Boss.FullName )
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Assistant.FullName)
+        </td>
+        <td>
+            @Html.ActionLink("Сотрудники", "Edit", new { id = item.DepartmentId }) |
+            @Html.ActionLink("Проекты", "ProjectsList", new { id = item.DepartmentId }) |
+            @Html.ActionLink("Удалить", "Delete", new { id = item.DepartmentId })
+        </td>
+    </tr>
+    }
+
+</table>
+
+@using (Html.BeginForm("HideUserSalary","Departments"))
+{
+@Html.AntiForgeryToken()
+<h4> Дополнительный список сотрудников</h4>
+
+<div class="form-horizontal">
+
+    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+    <table>
+        @foreach (var item in Model.HideSalaryUsers)
+    {
+    <tr>
+        <td>
+            @Html.DisplayFor(modelItem => item.FullName)
+        </td>
+        <td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
+        <td>
+            @Html.ActionLink("Удалить из списка", "ShowUserSalary", new { UserName = item.UserLogin })
+        </td>
+    </tr>
+    }
+    </table>
+    <hr />
+    <div class="form-group">
+        <div class="col-lg-8">
+            @Html.AutocompleteFor(model => model.NewHideSalaryUser, model => model.NewHideSalaryUser, "FindUserByName", "Departments", false, new { htmlAttributes = new { @class = "form-control" } })
+        </div>
+    </div>
+
+    <div class="form-group">
+        <div class="col-lg-8">
+            <input type="submit" value='Добавить' class="btn btn-default" />
+        </div>
+    </div>
+</div>
+}
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+    @Scripts.Render("~/bundles/typeahead")
+    <script type="text/javascript">
+        $('input.typeahead').on('typeahead:selected', function (event, selection) {
+            $('input.typeahead').typeahead('close');
+        });
+        $("form").bind("keypress", function (e) {
+            if (e.keyCode == 13) return false;
+        });
+    </script>
+
+}

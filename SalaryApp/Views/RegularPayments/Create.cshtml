@@ -1,0 +1,141 @@
+﻿@using SalaryApp.Models
+@model SalaryApp.Models.RegularPaymentEditModel
+
+@using (Html.BeginForm())
+{
+@Html.AntiForgeryToken()
+<div class="form-horizontal">
+    <h4>Новый регулярный платеж</h4>
+    <br /><br />
+
+    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+    <div class="form-group">
+        @Html.LabelFor(model => model.UserName, htmlAttributes: new { @class = "control-label col-md-2" })
+        <div class="col-md-1">
+            @Html.AutocompleteFor(model => model.UserName, model => model.UserName, "FindUserByName", "PaymentRequests", false, new { htmlAttributes = new { @class = "form-control" } })
+        </div>
+    </div>
+    <div class="form-group">
+        @Html.LabelFor(model => model.ProjectCode, htmlAttributes: new { @class = "control-label col-md-2" })
+
+        <div class="col-md-1">
+            @Html.AutocompleteFor(m => m.ProjectCode, m => m.ProjectCode, "FindProjectByDept", "PaymentRequests", false, new { htmlAttributes = new { @class = "form-control" } })
+        </div>
+    </div>
+    <div class="form-group">
+        @Html.LabelFor(model => model.ProjectShortName, htmlAttributes: new { @class = "control-label col-md-2" })
+
+        <div class="col-md-1">
+            @Html.AutocompleteFor(m => m.ProjectShortName, m => m.ProjectShortName, "FindProjectByDept", "PaymentRequests", false, new { htmlAttributes = new { @class = "form-control" } })
+        </div>
+    </div>
+    <div class="form-group">
+        @Html.LabelFor(model => model.Sum, htmlAttributes: new { @class = "control-label col-md-2" })
+
+        <div class="col-md-1">
+            @Html.EditorFor(model => model.Sum, new { htmlAttributes = new { @class = "form-control" } })
+        </div>
+    </div>
+    <div class="form-group">
+        @Html.LabelFor(model => model.PayoutFrom, htmlAttributes: new { @class = "control-label col-md-2" })
+        <div class="form-group col-md-1">
+            @Html.TextBoxFor(m => m.PayoutFrom, "{0:dd.MM.yyyy}", new { @class = "form-control datepicker", @placeholder = "Дата от" })
+        </div>
+    </div>
+    <div class="form-group">
+        @Html.LabelFor(model => model.PayoutTo, htmlAttributes: new { @class = "control-label col-md-2" })
+        <div class="form-group col-md-1">
+            @Html.TextBoxFor(m => m.PayoutTo, "{0:dd.MM.yyyy}", new { @class = "form-control datepicker", @placeholder = "Дата до" })
+        </div>
+    </div>
+
+    @if (Model != null)
+    {
+        if (Model.isDublicateErr)
+        {
+            @Html.ActionLink("Для редактирования регулярной выплаты перейдите по ссылке ", "Edit", new { id = Model.RegularPaymentId })
+        }
+    }
+
+
+    <hr />
+    <div class="form-group">
+        <div class="col-md-10">
+            <input type="submit" value="Создать" class="btn btn-default" />
+        </div>
+    </div>
+
+</div>
+}
+
+
+<div>
+    @Html.ActionLink("Back to List", "Index")
+</div>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+    @Scripts.Render("~/bundles/typeahead")
+    @Scripts.Render("~/bundles/comma_validate")
+
+    <script type="text/javascript">
+
+        $(function () {
+            $('.datepicker').datepicker({ format: 'dd.mm.yyyy', language: "ru" });
+            $(".datepicker").attr("input-validation-error");
+
+            $.validator.addMethod('date',
+                function (value, element) {
+                    return true; // since MVC4 data-val-date is put on EVERY vm date property. Default implementation does not allow for multiple cultures...
+                });
+
+            $.validator.addMethod('validbirthdate', function (value, element, params) {
+                var currentDate = new Date();
+                if (Date.parse(value) > currentDate) {
+                    return false;
+                }
+                return true;
+            }, '');
+
+            $.validator.unobtrusive.adapters.add('validbirthdate', function (options) {
+                options.rules['validbirthdate'] = {};
+                options.messages['validbirthdate'] = options.message;
+            });
+
+
+
+
+        });
+
+        $('input.typeahead').on('typeahead:selected', function (event, selection, name) {
+
+            $('input.typeahead').typeahead('close');
+            var pname = $('#' + this.id).val();
+            var arr = pname.split(/[_-]/);
+
+
+            if (this.id == 'ProjectCode' || this.id == 'ProjectShortName') {
+                if (arr.length == 1) {
+                    $('#ProjectCode').typeahead('val', '');
+                    $('#ProjectShortName').typeahead('val', pname);
+                    $('#ProjectShortName').val(pname);
+                }
+                else if (arr.length > 1) {
+                    $('#ProjectCode').typeahead('val', arr[0]);
+                    $('#ProjectCode').val(arr[0]);
+
+                    var pos1 = pname.indexOf('_');
+                    if (pos1 === -1) pos1 = 111111111111;
+                    var pos2 = pname.indexOf('-');
+                    if (pos2 === -1) pos2 = 111111111111;
+                    var pos = pos1 > pos2 ? pos2 : pos1;
+                    pname = pname.substring(pos + 1);
+                    $('#ProjectShortName').typeahead('val', pname);
+                    $('#ProjectShortName').val(pname);
+                }
+                $('#' + this.id).typeahead('close');
+            }
+        });
+
+    </script>
+}

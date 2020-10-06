@@ -1,0 +1,138 @@
+﻿@using SalaryApp.Models
+@model SalaryApp.Models.PaymentRequestEditModel
+
+@{
+    ViewBag.Title = "Edit";
+}
+
+@using (Html.BeginForm("Edit", "PaymentRequests", FormMethod.Post, new { encType = "multipart/form-data" }))
+{
+@Html.AntiForgeryToken()
+<div class="form-horizontal">
+    <h4>Редактируйте заявку</h4>
+    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+    @Html.HiddenFor(model => model.PaymentRequestId)
+    @Html.HiddenFor(model => model.ProjectName)
+    <div class="form-group">
+        @Html.LabelFor(model => model.ProjectCode, htmlAttributes: new { @class = "control-label col-md-2" })
+        <div class="col-md-10">
+            @Html.EditorFor(model => model.ProjectCode, new { htmlAttributes = new { @class = "form-control", @disabled = "disabled" } })
+        </div>
+        @Html.LabelFor(model => model.ProjectShortName, htmlAttributes: new { @class = "control-label col-md-2" })
+        <div class="col-md-10">
+            @Html.EditorFor(model => model.ProjectShortName, new { htmlAttributes = new { @class = "form-control", @disabled = "disabled" } })
+        </div>
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(model => model.Sum, htmlAttributes: new { @class = "control-label col-md-2" })
+        <div class="col-md-10">
+            <table>
+                <tr>
+                    <td>
+                        @Html.EditorFor(model => model.Sum, new { htmlAttributes = new { @class = "form-control" } })
+                    </td>
+                    <td>
+                        @Html.EnumDropDownListFor(model => model.type, new { @class = "form-control" })
+                    </td>
+                </tr>
+            </table>
+            @Html.ValidationMessageFor(model => model.Sum, "", new { @class = "text-danger" })
+        </div>
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(model => model.UserName, htmlAttributes: new { @class = "control-label col-md-2" })
+        <div class="col-md-10">
+            @Html.AutocompleteFor(model => model.UserName, model => model.UserName, "FindUserByName", "PaymentRequests", false, new { htmlAttributes = new { @class = "form-control" } })
+        </div>
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(model => model.AgreedPM, htmlAttributes: new { @class = "control-label col-md-2" })
+        <div class="col-md-10">
+            @Html.CheckBoxFor(model => model.AgreedPM, new { htmlAttributes = new { @class = "form-control" } })
+        </div>
+    </div>
+    @if (!String.IsNullOrEmpty(Model.AttachFileName))
+        {
+    <div class="form-group">
+        @Html.LabelFor(model => model.DeleteAttachedFile, htmlAttributes: new { @class = "control-label col-md-2" })
+        <div class="col-md-10">
+            @Html.CheckBoxFor(model => model.DeleteAttachedFile, new { htmlAttributes = new { @class = "form-control" } })
+        </div>
+
+    </div>
+        }
+
+    <div class="form-group">
+        @Html.LabelFor(model => model.File, htmlAttributes: new { @class = "control-label col-md-2" })
+        <div class="col-md-10">
+            @Html.TextBoxFor(model => model.File, new { type = "file" })
+        </div>
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(model => model.Comments, htmlAttributes: new { @class = "control-label col-md-2" })
+        <div class="col-md-10">
+            @Html.TextAreaFor(model => model.Comments, 5, 200, new { @class = "form-control" })
+        </div>
+    </div>
+
+    <div class="form-group">
+        @if( this.User.IsInRole(SalaryRoles.Managers) || this.User.IsInRole(SalaryRoles.Assistant))
+            {
+        @Html.LabelFor(model => model.SetStateWaitConfirm, htmlAttributes: new { @class = "control-label col-md-2" })
+        <div class="col-md-10">
+            @Html.CheckBoxFor(model => model.SetStateWaitConfirm, new { htmlAttributes = new { @class = "form-control" } })
+        </div>
+            }
+            else if (this.User.IsInRole(SalaryRoles.Directors))
+            {
+        @Html.LabelFor(model => model.SetStateCredited, htmlAttributes: new { @class = "control-label col-md-2" })
+        <div class="col-md-10">
+            @Html.CheckBoxFor(model => model.SetStateCredited, new { htmlAttributes = new { @class = "form-control" } })
+        </div>
+            }
+    </div>
+
+    <hr />
+
+    <div class="form-group">
+        <div class="col-md-10">
+            <input type="submit" value="Применить изменения" class="btn btn-default" />
+        </div>
+    </div>
+
+    <hr />
+    <div class="form-group">
+        @Html.LabelFor(model => model.HistoryComments, htmlAttributes: new { @class = "control-label col-md-2" })
+        <div class="col-md-10">
+            @Html.Raw(Model.HistoryComments)
+        </div>
+    </div>
+
+
+</div>
+}
+
+<div>
+    @Html.ActionLink("Back to List", "Index")
+</div>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+    @Scripts.Render("~/bundles/typeahead")
+    @Scripts.Render("~/bundles/comma_validate")
+
+    <script type="text/javascript">
+
+        $('input.typeahead').on('typeahead:selected', function (event, selection) {
+            $('input.typeahead').typeahead('close');
+        });
+        $("form").bind("keypress", function (e) {
+            if (e.keyCode == 13) return false;
+        });
+    </script>
+
+}

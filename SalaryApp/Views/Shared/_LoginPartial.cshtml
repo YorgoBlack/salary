@@ -1,0 +1,49 @@
+﻿@using Microsoft.AspNet.Identity
+@using SalaryApp.Models
+
+@if (Request.IsAuthenticated)
+{
+    if (this.User.Identity.Name != "root")
+    {
+    <ul class="nav navbar-nav">
+        <li>@Html.ActionLink("Просмотр премий", "Index", "Home")</li>
+    </ul>
+
+        if (this.User.IsInRole(SalaryRoles.Administrators) || this.User.IsInRole(SalaryRoles.Directors))
+        {
+        <ul class="nav navbar-nav">
+            <li>@Html.ActionLink("Начисление премий", "Index", "PaymentRequests")</li>
+            <li>@Html.ActionLink("Регулярные платежи", "Index", "RegularPayments")</li>
+            <li>@Html.ActionLink("Выплаты", "Projects", "Home")</li>
+            <li>@Html.ActionLink("Счёт для выплат", "Index", "PaymentsGroups")</li>
+            <li>@Html.ActionLink("Настройки", "Index", "Departments")</li>
+        </ul>
+        }
+        else
+        {
+            if (this.User.IsInRole(SalaryRoles.Managers) || this.User.IsInRole(SalaryRoles.Assistant))
+            {
+            <ul class="nav navbar-nav">
+                <li>@Html.ActionLink("Начисление премий", "Index", "PaymentRequests")</li>
+                <li>@Html.ActionLink("Выплаты", "Projects", "Home")</li>
+            </ul>
+            }
+        }
+
+        using (Html.BeginForm("LogOff", "Account", FormMethod.Post, new { id = "logoutForm", @class = "navbar-right" }))
+        {
+        @Html.AntiForgeryToken()
+        <ul class="nav navbar-nav navbar-right">
+            <li>
+                @Html.ActionLink("Здравствуйте " + User.Identity.GetUserName() + "!", "Detail", "Account", routeValues: null, htmlAttributes: new { title = "Manage" })
+            </li>
+            <li><a href="javascript:document.getElementById('logoutForm').submit()">Выйти</a></li>
+        </ul>
+        }
+    }
+
+}
+
+<ul class="nav navbar-nav navbar-right">
+    <li>@Html.ActionLink("Справка", "Index", "Help")</li>
+</ul>

@@ -1,0 +1,67 @@
+﻿@using SalaryApp.Models
+@model IEnumerable<SalaryApp.Models.RegularPayment>
+
+
+<style>
+.NoBorder {
+    border: none
+}
+
+</style>
+<h2>Регулярные платежи</h2>
+<p>
+    @Html.ActionLink("Создать регулярный платеж", "Create")
+</p>
+<table class="table">
+    <tr>
+        <th>
+            ФИО
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Project.Name)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Sum)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.PayoutFrom)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.PayoutTo)
+        </th>
+        <th></th>
+    </tr>
+
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td>
+                @if(item.RecipientUser.ShortName == null) {
+                    @item.RecipientUser.FullName
+                }
+                else {
+                    @item.RecipientUser.ShortName
+                }
+                
+            </td>
+            <td>
+                @item.Project.Name
+            </td>
+            <td>
+                @item.Sum
+            </td>
+            <td>
+                @Html.TextBoxFor(Model=>item.PayoutFrom, "{0:MMM-yyyy}", new { @readonly = true, @class="NoBorder" })
+            </td>
+            <td>
+                @Html.TextBoxFor(Model => item.PayoutTo, "{0:MMM-yyyy}", new { @readonly = true, @class = "NoBorder" })
+            </td>
+            <td>
+                @Html.ActionLink("Изменить", "Edit", new { id = item.RegularPaymentId })
+                &nbsp;&nbsp;&nbsp;
+                @Html.ActionLink("Удалить", "Delete", new { id = item.RegularPaymentId })
+            </td>
+        </tr>
+    }
+
+</table>

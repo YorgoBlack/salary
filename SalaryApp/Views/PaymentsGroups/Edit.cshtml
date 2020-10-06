@@ -1,0 +1,89 @@
+﻿@model SalaryApp.Models.PG_ListViewModel
+@using SalaryApp.Models
+
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+    @Html.HiddenFor(model => model.Header.PaymentsGroupId)
+    @Html.HiddenFor(model => model.Header.ShowEditable)
+
+    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+
+    @Html.Partial("Details")
+
+    <hr>
+    <div class="form-group">
+        <table width="50%">
+            <tr>
+                <td><input type="submit" value="Сохранить" name="action:SaveEdit" class="btn btn-default" /></td>
+                <td><input type="submit" value="Сохранить и вернуться к списку счетов" name="action:Edit" class="btn btn-default" /></td>
+                <td><input type="submit" value="Вернуться к списку без сохранения" name="action:CancelEdit" class="btn btn-default" /></td>
+            </tr>
+        </table>
+    </div>
+}
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+    @Scripts.Render("~/bundles/typeahead")
+    <script type="text/javascript">
+        $('input.typeahead').on('typeahead:selected', function (event, selection) {
+            $('input.typeahead').typeahead('close');
+            if (event.target.id == "NewUserPaymentName") {
+                $("#NewUserPaymentProject").hide();
+                $("#NewUserPaymentProject").find('option').remove();
+                $("#NewUserPaymentSum").hide();
+                $("#NewUserPaymentProjectLabel").hide();
+                $("#NewUserPaymentSumLabel").hide();
+                $("#NewUserPaymentButton").hide();
+
+                $.ajax({
+                    type: "GET",
+                    url: "/PaymentsGroups/UserBalances",
+                    contentType: "application/json; charset=utf-8",
+                    data: { FullName: $("#NewUserPaymentName").val(), PaymentsGroupId: $("#Header_PaymentsGroupId").val() },
+                    datatype: "json",
+                    success: function (data) {
+                        if (data.length > 0) {
+                            var options = '';
+                            for (var i = 0; i < data.length; i++) {
+                                options += '<option value="' + data[i].ProjectId + '" Sum="' + data[i].Sum + '">' + data[i].Name + '</option>';
+                                console.log(data[i].ProjectId);
+                            }
+                            $("#NewUserPaymentSum").val(data[0].Sum);
+                            $("#NewUserPaymentProject").append(options);
+                            $("#NewUserPaymentProject").show();
+                            $("#NewUserPaymentSum").show();
+                            $("#NewUserPaymentProjectLabel").show();
+                            $("#NewUserPaymentSumLabel").show();
+                            $("#NewUserPaymentButton").show();
+                        }
+                    },
+                    error: function () {
+                        alert("Dynamic content load failed.");
+                    }
+                });
+            }
+        });
+
+        $("#NewUserPaymentProject").change(function () {
+            var v  = $("option:selected", this).attr('Sum');
+            console.log(v);
+            $("#NewUserPaymentSum").val(v);
+        });
+
+        $("form").bind("keypress", function (e) {
+            if (e.keyCode == 13) return false;
+        });
+
+
+
+
+
+
+
+
+    </script>
+
+}

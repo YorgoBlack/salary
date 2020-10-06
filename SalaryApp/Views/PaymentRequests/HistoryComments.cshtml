@@ -1,0 +1,12 @@
+﻿@model SalaryApp.Models.PaymentRequestEditModel
+
+<div>
+    <div class="modal-header">
+        <b>Журнал сообщений по заявке </b>
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+    </div>
+    
+    <div style="margin:30px;">
+        @Html.Raw(Model.HistoryComments)
+    </div>
+</div>  

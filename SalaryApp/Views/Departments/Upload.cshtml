@@ -1,0 +1,45 @@
+﻿@using SalaryApp.Models
+@model UploadResultModel
+@{
+    ViewBag.Title = "Загрузка файла";
+}
+
+@if (Model.HasError)
+{
+    <h3>Ошибка импорта данных </h3>
+    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+}
+else
+{
+    <h3>Импорт данных выполнен успешно</h3>
+    if (Model.NewUsers.Count > 0)
+    {
+        <h4>Добавлены новые пользователи</h4>
+        <ul>
+        @foreach (var item in Model.NewUsers)
+        {
+            <li>
+                @Html.DisplayFor(modelItem => item)
+            </li>
+        }
+        </ul>
+    }
+
+    if (Model.LoseUsers.Count > 0)
+    {
+        <h4>Пользователи не найденные в домене</h4>
+        <ul>
+        @foreach (var item in Model.LoseUsers)
+        {
+            <li>
+                @Html.DisplayFor(modelItem => item)
+            </li>
+        }
+        </ul>
+    }
+
+}
+
+
+
+

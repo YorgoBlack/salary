@@ -1,0 +1,46 @@
+﻿@using SalaryApp.Models
+@model SalaryApp.Models.UsersListItemModel
+
+@{
+    ViewBag.Title = "Учетная запись \"Директор\"";
+}
+
+<h2>@ViewBag.Title.</h2>
+
+@using (Html.BeginForm())
+{
+    @Html.ValidationSummary()
+    @Html.AntiForgeryToken()
+    <div class="form-horizontal">
+
+        <h4>Введите ФИО пользователя для роли "Директор"</h4>
+        <hr />
+        <div class="form-group">
+            @Html.LabelFor(Model => Model.Name, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.AutocompleteFor(Model => Model.Name, model => model.Name, "FindUserByName", "Departments", false, new { htmlAttributes = new { @class = "form-control" } })
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                <input type="submit" class="btn btn-primary" value="Применить" onclick="Alert('FDfdsfsd');" />
+            </div>
+        </div>
+    </div>
+}
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+    @Scripts.Render("~/bundles/typeahead")
+
+    <script type="text/javascript">
+        $('input.typeahead').on('typeahead:selected', function (event, selection) {
+            $('input.typeahead').typeahead('close');
+        });
+        $("form").bind("keypress", function (e) {
+            if (e.keyCode == 13) return false;
+        });
+    </script>
+
+
+}

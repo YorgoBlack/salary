@@ -1,0 +1,76 @@
+﻿@model SalaryApp.Models.RateUploadModel
+@{
+    ViewBag.Title = "Загрузка файла";
+}
+<h2>Для создания счета требуется файл ставок </h2>
+<h3>Выберите файл для импорта </h3>
+@using (Html.BeginForm("UploadForm", "PaymentsGroups", FormMethod.Post, new { enctype = "multipart/form-data" }))
+{
+    @Html.AntiForgeryToken()
+    @Html.ValidationSummary()
+    <input type="file" name="UploadFile" /><br>
+    <span>Задайте процентную ставку для расчета выплат</span><br />
+    <input type="number" name="SalaryRate" value="@Model.SalaryRate" />
+    <br />
+    <br />
+    if (Model.regularPayments != null)
+    {
+        <hr />
+        <h3>Отметьте регулярные платежи для включения в счёт</h3>
+        <dt>
+            @Html.CheckBoxFor(m => m.NotUseReqularPayment) @Html.LabelFor(m => m.NotUseReqularPayment)
+        </dt>
+        <hr />
+        <table class="table">
+            <thead>
+            <tr>
+                <th>вкл/выкл</th>
+                <th>
+                    ФИО
+                </th>
+                <th>
+                    Проект
+                </th>
+                <th>
+                    Сумма
+                </th>
+            </tr>
+            </thead>
+            @for(int i=0; i < Model.regularPayments.Length; i++)
+            {
+                <tr>
+                    <td>
+                        @Html.CheckBoxFor(modelItem => Model.accrueRegularPayments[i], new { @class = "NoUseRegularPaymentClass" })
+                        @Html.HiddenFor(modelItem => Model.regularPaymentIds[i])
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => Model.regularPayments[i].RecipientUser.FullName)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => Model.regularPayments[i].Project.Name)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => Model.regularPayments[i].Sum)
+                    </td>
+                </tr>
+            }
+        </table>
+        <hr />
+    }
+
+    <input type="submit" value="Сформировать счет" />
+
+
+    <script>
+        $('#NotUseReqularPayment').click(function () {
+            
+            if ($('#NotUseReqularPayment').prop("checked")) {
+                $('.NoUseRegularPaymentClass').prop("checked", false);
+            }
+            else {
+                $('.NoUseRegularPaymentClass').prop("checked", true);
+            }
+        });
+
+    </script>
+}

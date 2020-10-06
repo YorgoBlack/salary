@@ -1,0 +1,37 @@
+﻿@using SalaryApp.Models
+@model IEnumerable<SalaryApp.Models.Project>
+
+@{
+    ViewBag.Title = "Направление " + ViewBag.DeptName;
+    if (this.User.IsInRole(SalaryRoles.Administrators) || this.User.IsInRole(SalaryRoles.Directors))
+    {
+        ViewBag.Title += (ViewBag.BossName == "" ? "" : ("," + ViewBag.BossName));
+    }
+}
+
+<h2>@ViewBag.Title.</h2>
+
+<table class="table">
+    <tr>
+        <th>
+            Название проекта
+        </th>
+    </tr>
+
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Name)
+            </td>
+        </tr>
+    }
+
+</table>
+
+@if (this.User.IsInRole(SalaryRoles.Administrators) || this.User.IsInRole(SalaryRoles.Directors))
+{
+    <div>
+    @Html.ActionLink("Back to List", "Index")
+    </div>
+}

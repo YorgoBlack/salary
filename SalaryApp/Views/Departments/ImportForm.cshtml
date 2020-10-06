@@ -1,0 +1,13 @@
+﻿@{
+    ViewBag.Title = "Импорт";
+}
+<h3>Выберите файл для импорта выплат и настроек </h3>
+@using (Html.BeginForm("ImportForm", "Departments", FormMethod.Post, new { enctype = "multipart/form-data" }))
+{
+@Html.AntiForgeryToken()
+@Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+
+<input type="file" name="upload" /><br>
+<input type="submit" value="Выполнить" />
+}
